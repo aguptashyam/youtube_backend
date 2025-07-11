@@ -155,8 +155,11 @@ const logoutUser = asyncHandler(async(req, res) => {
     await User.findByIdAndUpdate(
         req.user._id,
         {
-            $set: {
-                refreshToken: undefined
+            // $set: {
+            //     refreshToken: undefined
+            // }
+            $unset: {
+                refreshToken: 1  //this removes the field from document
             }
         },
         {
@@ -269,10 +272,10 @@ const updateAccountDetails = asyncHandler(async (req, res) => {
 
 
 const updateUserAvatar = asyncHandler(async (req, res) => {
-    // console.log(req.file);
+    console.log(req.file);
 
     const avatarLocalPath = req.file?.path
-    
+
     if(!avatarLocalPath){
         throw new ApiError(400, "Avatar file is missing")
     }
@@ -294,15 +297,15 @@ const updateUserAvatar = asyncHandler(async (req, res) => {
         {new: true}
     ).select("-password")
 
-    // // Delete old avatar if exists
-    // if (req.user?.avatar) {
-    //     try {
-    //         await deleteFromCloudinary(req.user.avatar);
-    //     } catch (err) {
-    //         // Optionally log error, but don't block avatar update
-    //         console.error("Failed to delete old avatar:", err.message);
-    //     }
-    // }
+    // Delete old avatar if exists
+    if (req.user?.avatar) {
+        try {
+            await deleteFromCloudinary(req.user.avatar);
+        } catch (err) {
+            // Optionally log error, but don't block avatar update
+            console.error("Failed to delete old avatar:", err.message);
+        }
+    }
 
     return res.status(200)
     .json(new ApiResponse(200, user, "Avatar Updated Successfully"))
