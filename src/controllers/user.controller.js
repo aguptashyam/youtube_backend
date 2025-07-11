@@ -1,7 +1,7 @@
 import {asyncHandler} from '../utils/asyncHandler.js';
 import {ApiError} from '../utils/ApiError.js';
 import {User} from '../models/user.model.js';
-import {uploadOnCloudinary} from '../utils/cloudinary.js';
+import {uploadOnCloudinary, deleteFromCloudinary} from '../utils/cloudinary.js';
 import { ApiResponse } from '../utils/ApiResponse.js';
 import jwt from 'jsonwebtoken';
 
@@ -268,11 +268,13 @@ const updateAccountDetails = asyncHandler(async (req, res) => {
 
 
 const updateUserAvatar = asyncHandler(async (req, res) => {
-    const avatarLocalPath = req.file?.path
+    // console.log(req.file);
 
+    const avatarLocalPath = req.file?.path
     if(!avatarLocalPath){
         throw new ApiError(400, "Avatar file is missing")
     }
+
 
     const avatar = await uploadOnCloudinary(avatarLocalPath)
 
@@ -289,6 +291,16 @@ const updateUserAvatar = asyncHandler(async (req, res) => {
         },
         {new: true}
     ).select("-password")
+
+    // // Delete old avatar if exists
+    // if (req.user?.avatar) {
+    //     try {
+    //         await deleteFromCloudinary(req.user.avatar);
+    //     } catch (err) {
+    //         // Optionally log error, but don't block avatar update
+    //         console.error("Failed to delete old avatar:", err.message);
+    //     }
+    // }
 
     return res.status(200)
     .json(new ApiResponse(200, user, "Avatar Updated Successfully"))
