@@ -1,6 +1,7 @@
 import express from 'express'
 import cors from 'cors'
 import cookieParser from 'cookie-parser'
+// import { errorHandler } from './middlewares/error.middleware.js'
 
 const app = express()
 
@@ -38,4 +39,6 @@ app.use("/api/v1/playlist", playlistRouter)
 app.use("/api/v1/dashboard", dashboardRouter)
 
 // http://localhost:8000/api/v1/users/register
+
+// app.use(errorHandler)
 export {app}
